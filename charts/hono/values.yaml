@@ -2071,12 +2071,12 @@ dataGridExample:
 
 jaegerBackendExample:
 
-  # enabled indicates whether the example Jaeger all-in-one
+  # enabled indicates whether the example Jaeger
   # back end should be deployed and used.
   enabled: false
-  # allInOneImage contains the name (including tag)
+  # imageName contains the name (including tag)
   # of the container image to use for the example Jaeger back end.
-  allInOneImage: "jaegertracing/all-in-one:1.57"
+  jaegerImage: "jaegertracing/jaeger:2.20.0"
   # [DEPRECATED: use probes instead] livenessProbeInitialDelaySeconds contains the value to use for the "initialDelaySeconds"
   # configuration property of the component's liveness probe.
   # The value of the top level "livenessProbeInitialDelaySeconds" property will be used if not set.
@@ -2089,11 +2089,11 @@ jaegerBackendExample:
     livenessProbe:
       initialDelaySeconds: 300
       httpGet:
-        path: "/"
+        path: "/status"
     readinessProbe:
       initialDelaySeconds: 10
       httpGet:
-        path: "/"
+        path: "/status"
   # resources contains the container's requests and limits for CPU and memory
   # as defined by the Kubernetes API.
   # Refer to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
@@ -2115,11 +2115,9 @@ jaegerBackendExample:
     priorityClassName: ""
     affinity: {}
 
-  # env contains environment variables to set for the Jaeger all-in-one container.
-  # The default variables configure the container to keep up to 100000 traces in memory.
-  env:
-  - name: "MEMORY_MAX_TRACES"
-    value: "100000"
+  # The default settings configure the container to keep up to 100000 traces in memory.
+  config:
+    max_traces: 100000
 
   # extraVolumes contains additional kubernetes Volume definitions representing volumes
   # that can mounted into the container's file system.
@@ -2143,7 +2141,7 @@ jaegerBackendExample:
 
 # otelCollectorAgentImage contains the name (including tag) of the container image
 # to use for the OpenTelemetry collector agent sidecar containers.
-# These containers are deployed with Hono's components if the example Jaeger all-in-one
+# These containers are deployed with Hono's components if the example Jaeger
 # deployment is disabled and "otelCollectorAgentConfigMap" is not null.
 otelCollectorAgentImage: "otel/opentelemetry-collector:0.100.0"
 # otelCollectorAgentConfigMap can be used to specify the name of an existing ConfigMap

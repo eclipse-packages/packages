@@ -1,6 +1,6 @@
 {{- if .Values.jaegerBackendExample.enabled }}
 #
-# Copyright (c) 2019, 2022 Contributors to the Eclipse Foundation
+# Copyright (c) 2019 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -11,8 +11,9 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-{{- $args := dict "dot" . "component" "tracing" "name" "jaeger-all-in-one" "componentConfig" .Values.jaegerBackendExample }}
-{{- $healthCheckPort := include "hono.healthCheckPort" . }}
+{{- $args := dict "dot" . "component" "tracing" "name" "jaeger" "componentConfig" .Values.jaegerBackendExample }}
+{{- $metricsPort := .Values.jaegerBackendExample.metricsPort | default "8888" }}
+{{- $healthPort := .Values.jaegerBackendExample.healthPort | default "13133" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,7 +29,7 @@ spec:
       {{- include "hono.podAdditionalLabels" $args | nindent 8 }}
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: {{ $healthCheckPort | quote }}
+        prometheus.io/port: {{ $metricsPort | quote }}
         prometheus.io/scheme: "http"
         {{- include "hono.podAdditionalAnnotations" $args | nindent 8 }}
     spec:
@@ -40,12 +41,9 @@ spec:
       {{- include "hono.pod.affinity" $args | nindent 6 }}
       containers:
       - name: jaeger
-        image: {{ .Values.jaegerBackendExample.allInOneImage }}
+        image: {{ .Values.jaegerBackendExample.jaegerImage }}
+        args: ["--config=/etc/jaeger/jaeger.yaml"]
         env:
-        - name: ADMIN_HTTP_HOST_PORT
-          value: {{ printf ":%s" $healthCheckPort | quote }}
-        - name: COLLECTOR_OTLP_ENABLED
-          value: "true"
         {{- with .Values.jaegerBackendExample.env }}
         {{- range $name,$value := . }}
         - name: {{ .name }}
@@ -53,25 +51,32 @@ spec:
         {{- end }}
         {{- end }}
         ports:
-        - name: collector-grpc
-          containerPort: 14250
-          protocol: TCP
         - name: otlp-grpc
           containerPort: 4317
           protocol: TCP
-        - name: server-http
-          containerPort: 5778
+        - name: otlp-http
+          containerPort: 4318
           protocol: TCP
         - name: query-http
           containerPort: 16686
           protocol: TCP
         - name: health
-          containerPort: {{ $healthCheckPort }}
+          containerPort: {{ $healthPort }}
           protocol: TCP
+        - name: metrics
+          containerPort: {{ $metricsPort }}
+          protocol: TCP
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/jaeger
         {{- include "hono.component.envFrom" $args | indent 8 }}
         {{- with .Values.jaegerBackendExample.resources }}
         resources:
           {{- . | toYaml | nindent 10 }}
         {{- end }}
         {{- include "hono.component.healthChecks" $args | nindent 8 }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: jaeger-v2-config
 {{- end }}
