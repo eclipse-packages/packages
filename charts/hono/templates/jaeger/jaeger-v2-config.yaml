@@ -1,0 +1,55 @@
+{{- if .Values.jaegerBackendExample.enabled }}
+#
+# Copyright (c) 2026 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-v2-config
+data:
+  jaeger.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+
+    exporters:
+      jaeger_storage_exporter:
+        trace_storage: RAM_backend
+
+    extensions:
+      jaeger_storage:
+        backends:
+          RAM_backend:
+            memory:
+              max_traces: {{ .Values.jaegerBackendExample.config.max_traces | default 100000 }}
+      jaeger_query:
+        storage:
+          traces: RAM_backend
+        http:
+          endpoint: "0.0.0.0:16686"
+      healthcheckv2:
+        use_v2: true
+        http:
+          endpoint: "0.0.0.0:{{ .Values.jaegerBackendExample.healthPort | default "13133" }}"
+
+    service:
+      extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [jaeger_storage_exporter]
+{{- end }}

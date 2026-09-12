@@ -481,15 +481,14 @@ quarkus:
       "io.quarkus.vertx.core.runtime":
         level: DEBUG
   {{- if or .dot.Values.jaegerBackendExample.enabled .dot.Values.otelCollectorAgentConfigMap }}
-  opentelemetry:
-    tracer:
-      exporter:
-        otlp:
-          {{- if .dot.Values.jaegerBackendExample.enabled }}
-          endpoint: {{ printf "http://%s-jaeger-collector:4317" ( include "hono.fullname" .dot ) | quote }}
-          {{- else }}
-          endpoint: "http://127.0.0.1:4317"
-          {{- end }}
+  otel:
+    exporter:
+      otlp:
+        {{- if .dot.Values.jaegerBackendExample.enabled }}
+        endpoint: {{ printf "http://%s-jaeger-collector:4317" ( include "hono.fullname" .dot ) | quote }}
+        {{- else }}
+        endpoint: "http://127.0.0.1:4317"
+        {{- end }}
   {{- end }}
   vertx:
     prefer-native-transport: true

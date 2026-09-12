@@ -1,6 +1,6 @@
 {{- if .Values.jaegerBackendExample.enabled }}
 #
-# Copyright (c) 2019, 2022 Contributors to the Eclipse Foundation
+# Copyright (c) 2019 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -18,10 +18,6 @@ metadata:
   {{- include "hono.metadata" $args | nindent 2 }}
 spec:
   ports:
-  - name: collector-grpc
-    port: 14250
-    protocol: TCP
-    targetPort: collector-grpc
   - name: otlp-grpc
     port: 4317
     protocol: TCP
