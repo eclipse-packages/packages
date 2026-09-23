@@ -1,7 +1,7 @@
 {
   "subject-dn": "CN=DEFAULT_TENANT_CA,OU=Hono,O=Eclipse IoT,L=Ottawa,C=CA",
-  "public-key": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyZkq26qbMmLNfjY7r5UK+26ce8tMyJEH6bsWHI0EBxJCLT4Ukf4dWy6VCNe/vXIVDOh9kdJmhewKIOKNyGR9JQ==",
+  "public-key": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAECDPE78R2bebMH4cN5EipmQQgTGxiebLtIcI0TtBa5V06xdVRqX8xRcsR+epYotLNXL0sYf0GZXdKXI2zxPrDVw==",
   "algorithm": "EC",
-  "not-before": "2025-06-30T20:57:41+02:00",
-  "not-after": "2026-06-30T20:57:41+02:00"
+  "not-before": "2026-09-23T22:10:24+03:00",
+  "not-after": "2027-09-23T22:10:24+03:00"
 }
